@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:todoey/database/repository.dart';
+import 'package:todoey/database/sqlite_repository.dart';
 import 'package:todoey/models/task_model.dart';
 import 'package:todoey/widgets/empty_list.dart';
 import 'task_list_tile_item.dart';
@@ -15,28 +16,28 @@ class TaskList extends StatefulWidget {
 class _TaskListState extends State<TaskList> {
   @override
   Widget build(BuildContext context) {
-    return Consumer<Repository>(
-      builder: (context, data, child) => FutureBuilder(
-        future: data.findAllTasks(),
-        builder: (context, snapshot) {
-          if (snapshot.hasData) {
-            List<Task> taskList = snapshot.data as List<Task>;
-            if (taskList.isEmpty) {
-              return const EmptyList();
-            } else {
-              return ListView.builder(
-                padding: const EdgeInsets.all(24.0),
-                itemBuilder: (context, index) {
-                  return TaskListTileItem(id: taskList[index].id);
-                },
-                itemCount: taskList.length,
-              );
-            }
-          } else {
-            return const EmptyList();
-          }
-        },
-      ),
+    return StreamBuilder(
+      builder: (BuildContext context, AsyncSnapshot snapshot) {
+        if (!snapshot.hasData) {
+          return const EmptyList();
+        }
+
+        if (snapshot.hasError) {
+          return Center(
+            child: Text('Something goes wrong, refer as below\n${snapshot.error.toString()}'),
+          );
+        }
+
+        List<Task> tasks = snapshot.data;
+        if (tasks.isEmpty) return const EmptyList();
+        return ListView.builder(
+          padding: const EdgeInsets.all(24.0),
+          itemBuilder: (context, index) =>
+              TaskListTileItem(task: tasks[index]),
+          itemCount: tasks.length,
+        );
+      },
+      stream: SqliteRepository().watchAllTasks(),
     );
   }
 }

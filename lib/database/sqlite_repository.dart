@@ -51,7 +51,6 @@ class SqliteRepository extends Repository {
 
   @override
   Future<int> toggleDone(Task task) {
-    // TODO: implement toggleDone
-    throw UnimplementedError();
+    return dbHelper.toggleDone(task);
   }
 }

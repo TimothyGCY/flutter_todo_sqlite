@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:todoey/database/repository.dart';
+import 'package:todoey/database/sqlite_repository.dart';
+import 'package:todoey/models/task_model.dart';
 import 'package:todoey/widgets/add_task_modal.dart';
 import 'package:todoey/widgets/task_list.dart';
 
@@ -11,11 +13,11 @@ class HomeScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Consumer<Repository>(
-      builder: (context, data, _) {
-        return FutureBuilder(
-          future: data.undoneCount,
-          builder: (context, snapshot) => Scaffold(
+    final SqliteRepository repo = SqliteRepository();
+    return StreamBuilder<List<Task>>(
+        stream: repo.watchAllTasks(),
+        builder: (context, snapshot) {
+          return Scaffold(
             backgroundColor: Colors.lightGreen,
             body: Container(
               padding: const EdgeInsets.only(top: 56.0),
@@ -50,7 +52,7 @@ class HomeScreen extends StatelessWidget {
                     left: 36,
                     top: (88 + 48 + 12),
                     child: Text(
-                      '${snapshot.hasData ? snapshot.data : 0} Task(s)',
+                      '${snapshot.hasError || !snapshot.hasData ? 0 : snapshot.data!.where((element) => !element.completed).length} Task(s)',
                       style: const TextStyle(color: Colors.white, fontSize: 16),
                     ),
                   ),
@@ -81,10 +83,7 @@ class HomeScreen extends StatelessWidget {
                 );
 
                 if (newTask.isNotEmpty) {
-                  int result = await data.insertTask(newTask);
-                  if (result != 0) {
-                    data.notifyListeners();
-                  }
+                  await repo.insertTask(newTask);
                 }
               },
               child: const Icon(
@@ -92,9 +91,7 @@ class HomeScreen extends StatelessWidget {
                 color: Colors.white,
               ),
             ),
-          ),
-        );
-      },
-    );
+          );
+        });
   }
 }
