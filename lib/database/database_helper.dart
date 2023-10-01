@@ -1,7 +1,7 @@
+import 'package:path/path.dart' show join;
 import 'package:path_provider/path_provider.dart';
 import 'package:sqlbrite/sqlbrite.dart';
 import 'package:synchronized/synchronized.dart';
-import 'package:path/path.dart';
 import 'package:todoey/models/task_model.dart';
 
 class DatabaseHelper {
@@ -45,9 +45,6 @@ class DatabaseHelper {
   Future<Database> _initDatabase() async {
     final documentDirectory = await getApplicationDocumentsDirectory();
     final path = join(documentDirectory.path, _databaseName);
-
-    // turn this off for production
-    Sqflite.setDebugModeOn(true);
 
     return openDatabase(path, version: _databaseVersion, onCreate: _onCreate);
   }
@@ -96,7 +93,8 @@ class DatabaseHelper {
   // find by single item
   Future<Task> findTaskById(String id) async {
     final db = await instance.streamDatabase;
-    final taskList = await db.query(taskTable, where: '$taskId = ?', whereArgs: [id]);
+    final taskList =
+        await db.query(taskTable, where: '$taskId = ?', whereArgs: [id]);
     final tasks = parseTaskFromDatabase(taskList);
     return tasks.first;
   }

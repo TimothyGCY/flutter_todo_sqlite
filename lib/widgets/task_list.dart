@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-import 'package:todoey/database/repository.dart';
 import 'package:todoey/database/sqlite_repository.dart';
 import 'package:todoey/models/task_model.dart';
 import 'package:todoey/widgets/empty_list.dart';
@@ -24,7 +22,8 @@ class _TaskListState extends State<TaskList> {
 
         if (snapshot.hasError) {
           return Center(
-            child: Text('Something goes wrong, refer as below\n${snapshot.error.toString()}'),
+            child: Text(
+                'Something goes wrong, refer as below\n${snapshot.error.toString()}'),
           );
         }
 
@@ -32,8 +31,7 @@ class _TaskListState extends State<TaskList> {
         if (tasks.isEmpty) return const EmptyList();
         return ListView.builder(
           padding: const EdgeInsets.all(24.0),
-          itemBuilder: (context, index) =>
-              TaskListTileItem(task: tasks[index]),
+          itemBuilder: (context, index) => TaskListTileItem(task: tasks[index]),
           itemCount: tasks.length,
         );
       },

@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-import 'package:todoey/database/repository.dart';
 import 'package:todoey/database/sqlite_repository.dart';
 import 'package:todoey/models/task_model.dart';
 
@@ -12,6 +10,7 @@ class TaskListTileItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final SqliteRepository repo = SqliteRepository();
+    final NavigatorState navigator = Navigator.of(context);
     return Row(
       crossAxisAlignment: CrossAxisAlignment.center,
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -22,10 +21,7 @@ class TaskListTileItem extends StatelessWidget {
           children: [
             Checkbox(
               value: task.completed,
-              onChanged: (b) async {
-                task.toggleDone();
-                await repo.toggleDone(task);
-              },
+              onChanged: (b) async => await repo.toggleDone(task),
             ),
             Text(
               task.title,
@@ -57,7 +53,7 @@ class TaskListTileItem extends StatelessWidget {
                   TextButton(
                     onPressed: () async {
                       await repo.deleteTask(task.id);
-                      Navigator.of(context).pop();
+                      navigator.pop();
                     },
                     child: const Text('Confirm'),
                   ),

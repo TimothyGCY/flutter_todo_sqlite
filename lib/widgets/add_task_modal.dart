@@ -11,6 +11,12 @@ class _AddTaskModalState extends State<AddTaskModal> {
   TextEditingController textEditingController = TextEditingController();
 
   @override
+  void dispose() {
+    textEditingController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Container(
       color: const Color(0xff757575),

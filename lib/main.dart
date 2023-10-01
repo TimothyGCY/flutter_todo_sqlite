@@ -24,10 +24,8 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     const String title = 'Todoey';
     return ChangeNotifierProvider<Repository>(
-      // i don't think this is the actual way to implement
       lazy: false,
       create: (context) => repository,
-      // dispose: (_, Repository repository) => repository.close(),
       builder: (context, _) => MaterialApp(
         title: title,
         theme: ThemeData(

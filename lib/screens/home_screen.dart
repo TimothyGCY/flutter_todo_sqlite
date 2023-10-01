@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-import 'package:todoey/database/repository.dart';
 import 'package:todoey/database/sqlite_repository.dart';
 import 'package:todoey/models/task_model.dart';
 import 'package:todoey/widgets/add_task_modal.dart';
@@ -10,6 +8,16 @@ class HomeScreen extends StatelessWidget {
   const HomeScreen({Key? key, required this.title}) : super(key: key);
 
   final String title;
+
+  String _getIncompleteTaskCounter(AsyncSnapshot<List<Task>> snapshot) {
+    late int count;
+    if (snapshot.hasError || !snapshot.hasData) {
+      count = 0;
+    } else {
+      count = snapshot.data!.where((t) => !t.completed).length;
+    }
+    return '$count Task(s)';
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -27,13 +35,15 @@ class HomeScreen extends StatelessWidget {
                     left: 36,
                     child: Container(
                       padding: const EdgeInsets.all(12.0),
+                      decoration: const BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: Colors.white,
+                      ),
                       child: const Icon(
                         Icons.list,
                         color: Colors.lightGreen,
                         size: 48,
                       ),
-                      decoration: const BoxDecoration(
-                          shape: BoxShape.circle, color: Colors.white),
                     ),
                   ),
                   Positioned(
@@ -52,8 +62,11 @@ class HomeScreen extends StatelessWidget {
                     left: 36,
                     top: (88 + 48 + 12),
                     child: Text(
-                      '${snapshot.hasError || !snapshot.hasData ? 0 : snapshot.data!.where((element) => !element.completed).length} Task(s)',
-                      style: const TextStyle(color: Colors.white, fontSize: 16),
+                      _getIncompleteTaskCounter(snapshot),
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 16,
+                      ),
                     ),
                   ),
                   Positioned(
